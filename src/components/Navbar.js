@@ -5,7 +5,7 @@ const Navbar = () => {
   return (
       <div className={navStyle.navbar}>
         <div className={navStyle.heading}>
-        <h1> Busy buy </h1>
+        <h1> Busybuy </h1>
         </div>
 
         <div className={navStyle.navbarContainer}>
@@ -15,12 +15,12 @@ const Navbar = () => {
                     <span> Home </span> 
                 </li>
                 
-                {/* <li> 
+                <li> 
                     <img src="https://img.freepik.com/free-icon/login-symbol_318-9896.jpg" alt="sign-in"/> 
                     <span> Sign In </span>
-                </li> */}
+                </li>
 
-                <li> 
+                {/* <li> 
                     <img src="https://www.pngmart.com/files/7/Cart-PNG-Clipart.png" alt="cart"/> 
                     <span> Cart </span>
                 </li>
@@ -31,9 +31,9 @@ const Navbar = () => {
                 </li>
 
                 <li>
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSak-8ASizqk4vo_tPwfUTWsmXeaswsf1fWRDqupJJm4kOdK-FEpStQ5M9qqHpgzQZGW4I&usqp=CAU"/>
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSak-8ASizqk4vo_tPwfUTWsmXeaswsf1fWRDqupJJm4kOdK-FEpStQ5M9qqHpgzQZGW4I&usqp=CAU" alt="sign-out"/>
                     <span> Sign Out </span>
-                </li>
+                </li> */}
 
             </ul>
         </div>
@@ -41,4 +41,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default Navbar;

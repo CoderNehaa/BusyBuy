@@ -1,29 +1,27 @@
-.heading{
-    position: absolute;
-    width: 30%;
+.navbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+    box-shadow: 0px 0px 8px 15px whitesmoke;
 }
 
-.heading h1{
-    margin-left: 80px;
+.heading{
+    width: 40%;
 }
 
 .navbarContainer{
-    position: absolute;
-    width: 70%;
-    left: 30%;
+    width: 60%;
 }
 
 .navbarContainer ul{
     display: flex;
     justify-content: space-evenly;
     list-style: none;
+    font-size: 25px;
 }
 
 .navbarContainer img{
     height: 25px;
     width: 30px;
-}
-
-.navbarContainer span{
-    font-size: 25px;
 }

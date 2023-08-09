@@ -4,6 +4,7 @@ function App() {
   return (
     <div className="App">
       <Navbar/>
+      <h1> HOME </h1>
     </div>
   );
 }
