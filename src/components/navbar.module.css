@@ -1,0 +1,29 @@
+.heading{
+    position: absolute;
+    width: 30%;
+}
+
+.heading h1{
+    margin-left: 80px;
+}
+
+.navbarContainer{
+    position: absolute;
+    width: 70%;
+    left: 30%;
+}
+
+.navbarContainer ul{
+    display: flex;
+    justify-content: space-evenly;
+    list-style: none;
+}
+
+.navbarContainer img{
+    height: 25px;
+    width: 30px;
+}
+
+.navbarContainer span{
+    font-size: 25px;
+}
