@@ -1,0 +1,33 @@
+.pageStyle {
+    height: 500px;
+    width: 500px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.pageStyle h1{
+    color:purple;
+    font-size: xxx-large;
+}
+
+.pageStyle input{
+    font-size: 20px;
+    width: 400px;
+    padding: 20px;
+    margin: 15px;
+    border-radius: 15px;
+}
+
+.pageStyle button{
+    font-size: 25px;
+    width: 450px;
+    padding: 20px;
+    margin: 15px;
+    border-radius: 15px;
+    color: white;
+    background-color: purple;
+}
+
+
