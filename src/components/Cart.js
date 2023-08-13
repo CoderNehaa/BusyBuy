@@ -2,7 +2,7 @@ import React from 'react';
 
 const Cart = () => {
   return (
-    <div>
+    <div style={{textAlign: 'center'}}>
       <h1> Cart is Empty !</h1>
     </div>
   )

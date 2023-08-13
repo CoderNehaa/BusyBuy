@@ -11,36 +11,3 @@
     margin: 55px;
     border-radius: 25px;
 }
-
-.sideBar{
-    top: 30%;
-    left: 0%;
-    padding: 10px 40px 20px 5px; 
-    font-size: 20px;
-    position: fixed;
-    text-align: center;
-    background-color: lavender;
-    border-top-right-radius: 5%;
-    border-bottom-right-radius: 5%;
-}
-
-.slider input{
-    width: 90%;
-    cursor: pointer;
-}
-
-.categories{
-    text-align: start;
-    padding: 5px;
-    letter-spacing: 1.5px;
-}
-
-.categories label{
-    display: block;
-    margin: 5px;
-}
-
-.categories input{
-    height: 18px;
-    width: 18px;
-}
