@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import formStyle from "./formStyle.module.css";
+
 import { Link, useNavigate } from 'react-router-dom';
 import { UserCustomHook } from '../context/UserContext';
 
 const SignInForm = () => {
   const [values, setValues] = useState({email:"", pass:""});
+  const {logIn, user} = UserCustomHook();
   const navigate = useNavigate();
-  const {logIn} = UserCustomHook();
 
   async function handleSubmit(e){
     e.preventDefault();
-    try{
-      await logIn(values.email, values.pass);
-      navigate('/');
-    } catch(err) {
-      console.log("err from component", err);
-    }
+    logIn(values);
   }
+
+  useEffect(() => {
+    if(user){
+      navigate('/');
+    }
+  }, [user])
 
   return (
     <div className={formStyle.pageStyle}>

@@ -2,70 +2,100 @@ import { createContext, useContext, useState, useEffect } from "react";
 
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
-import { auth } from '../../firebase';
+import db, { auth } from '../../firebase';
 import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+
 const userContext = createContext();
 
 // Custom Provider
 function UserCustomProvider({children}){
-    const[userName, setUserName] = useState("");
-    const [refresh, setRefersh] = useState(false);
-    
+    const[user, setUser] = useState(null);
+    const [data, setData] = useState([]);
+
     function errorNotification(text){
         toast(text);
     }
     
     // Sign up function
-    function signUp (name, email, password){
-        createUserWithEmailAndPassword(auth, email, password)
+    function signUp (data){
+        createUserWithEmailAndPassword(auth, data.email, data.pass)
         .then(async(res) => {
-            const user = res.user;
-            await updateProfile(user, {
-                displayName: name
+            console.log("signed up successfully.")
+            await updateProfile(res.user, {
+                displayName: data.name
             });
-            setRefersh(!refresh);
-            console.log( "user" ,user);
-            return user;
+            const currentUser = {
+                name: res.user.displayName,
+                email: res.user.email,
+                password:data.pass
+            }
+            setUser(currentUser);
+            console.log("currentUser", currentUser);
         }).catch((err) => {
             console.log("err from context", err.message);
             errorNotification(err.message);
-            return err;
         })
     }
 
     // Sign In
-    function logIn(email, password){
-         signInWithEmailAndPassword(auth, email, password)
-         .then(() => {setRefersh(!refresh)})
-         .catch((err) => {
+     function logIn(data){
+        signInWithEmailAndPassword(auth, data.email, data.pass)
+        .then(async (res) => {
+            console.log('signed in successfully');
+            const currentUser = {
+                name: res.user.displayName,
+                email: res.user.email,
+                password:data.pass
+            }
+            setUser(currentUser);
+            console.log(currentUser);
+
+            // Add the data to db = Add a new document in collection "users"
+                await setDoc(doc(db, "users", currentUser.email), {
+                    name: res.user.displayName,
+                    email: res.user.email,
+                    password:data.pass
+                });
+  
+        })
+        .catch((err) => {
             console.log("error while signing in ", err.message);
             errorNotification(err.message);
-         })
+        })
     }
 
     // Sign out
     function logOut(){
-        signOut(auth).then(() => {
-            setUserName('');
-          }).catch((err) => {
+        signOut(auth)
+        .then(() => {
+            console.log("signed out successfully ! ");
+            setUser('');
+        }).catch((err) => {
             console.log("error while signing out ! ", err);
             errorNotification(err.message);
-          });
+        });
     }
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if(currentUser){
-                setUserName(currentUser.displayName)
-            }
-        })
-        // return () => // Return a cleanup function
-        unsubscribe(); 
-    }, [refresh, userName])
+    // Fetch data / How do you store data from an API in React? = Using Axios Library
 
+    const fetchInfo = () => {
+        return axios.get('https://fakestoreapi.com/products').then((res) => setData(res.data));
+      };
+    
+      useEffect(() => {
+        fetchInfo();
+      }, [data]);
+
+    //   Add to cart
+    function addToCart(product){
+
+    }
+    
     return(
-        <userContext.Provider value={{ userName, signUp, logOut, logIn }}>
+        <userContext.Provider value={{ signUp, logOut, logIn, errorNotification, user, data, addToCart }}>
             {children}
         </userContext.Provider>
     )
