@@ -5,12 +5,12 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDXfmrCM610SSX7izMeuqs3YL6te8hnpFA",
-  authDomain: "busybuy-7c244.firebaseapp.com",
-  projectId: "busybuy-7c244",
-  storageBucket: "busybuy-7c244.appspot.com",
-  messagingSenderId: "421742309263",
-  appId: "1:421742309263:web:01f92b8b666921dc6ae5fa"
+  apiKey: "AIzaSyBlGCDFdiE-cxjQqvVWwfCjB7_VkgWVVQc",
+  authDomain: "eshoppy-4d51a.firebaseapp.com",
+  projectId: "eshoppy-4d51a",
+  storageBucket: "eshoppy-4d51a.appspot.com",
+  messagingSenderId: "179941487275",
+  appId: "1:179941487275:web:c5f530f31fcc43b38d3dee"
 };
 
 // Initialize Firebase
@@ -21,3 +21,4 @@ const auth = getAuth();
 
 export default db;
 export {app, auth};
+

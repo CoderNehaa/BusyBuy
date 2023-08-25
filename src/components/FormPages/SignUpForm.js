@@ -6,13 +6,13 @@ import { UserCustomHook } from '../context/UserContext';
 
 function SignUpForm () {
   const [values, setValues] = useState({name:"", email:"", pass:"", confirmPass:""});
-  const {signUp, user, errorNotification} = UserCustomHook();
+  const { signUp, user, toast } = UserCustomHook();
   const navigate = useNavigate();
 
   const handleSubmission = (e) => {
     e.preventDefault();
     if(values.pass !== values.confirmPass){
-      errorNotification("Password and confirm password does not match.");
+      toast.error("Password and confirm password does not match.");
       return;
     }
     signUp(values);
@@ -25,6 +25,7 @@ function SignUpForm () {
   }, [user])
   
   return (
+    <div className='pt-32 h-screen dark:bg-slate-900 dark:text-gray-400'>
     <div className={formStyle.pageStyle}>
       <h1> Sign Up </h1>
 
@@ -38,6 +39,7 @@ function SignUpForm () {
       </form>
 
       <Link to='/signin' className="linkStyle"> Or Signin instead </Link>
+    </div>
     </div>
   )
 }

@@ -15,10 +15,12 @@
 
 .pageStyle input{
     font-size: 20px;
-    width: 400px;
+    width: 440px;
     padding: 20px;
     margin: 15px;
     border-radius: 15px;
+    background: transparent;
+    border: 1px solid gray;
 }
 
 .pageStyle button{

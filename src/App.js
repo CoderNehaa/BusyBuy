@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
 import { RouterProvider, createBrowserRouter} from 'react-router-dom';
-
 import { UserCustomHook } from './components/context/UserContext';
+
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -10,15 +11,21 @@ import Cart from "./components/Cart";
 import Orders from "./components/Orders";
 import SignInForm from "./components/FormPages/SignInForm";
 import SignUpForm from "./components/FormPages/SignUpForm";
+import ErrorElement from './components/ErrorElement';
 
 function App() {
-  const {userName} = UserCustomHook();
-  const router = createBrowserRouter([
+  const {user, authentication} = UserCustomHook();
+  
+  useEffect(() => {
+    authentication();
+  }, [])  
 
-    {path: '/', element: <Navbar />, children:[
+  const router = createBrowserRouter([
+    {path: '/', element: <Navbar />, errorElement: <ErrorElement />,
+      children:[
       {index: true, element: <Home />},
-      {path:'/cart', element: userName===''? <Home/> : <Cart/> },
-      {path:'/orders', element: userName===''? <Home/> : <Orders/> },
+      {path:'/cart', element: user===null? <Home/> : <Cart/> },
+      {path:'/orders', element: user===null? <Home/> : <Orders/> },
       {path:'/signin', element: <SignInForm/>},
       {path:'/signup', element: <SignUpForm/>}
     ]},
@@ -27,7 +34,7 @@ function App() {
   return (
     <>
       <RouterProvider router={router}/>
-      <ToastContainer theme="dark"/>
+      <ToastContainer theme="dark" autoClose={2000}/>
     </>
   );
 }

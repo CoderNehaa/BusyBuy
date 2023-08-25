@@ -21,6 +21,7 @@ const SignInForm = () => {
   }, [user])
 
   return (
+    <div className='pt-32 h-screen dark:bg-slate-900 dark:text-gray-400'>
     <div className={formStyle.pageStyle}>
       <h1> Sign  In </h1>
       <form onSubmit={handleSubmit}>
@@ -30,6 +31,7 @@ const SignInForm = () => {
       </form>
 
       <Link to='/signup' className="linkStyle">  Or SignUp instead </Link>
+    </div>
     </div>
   )
 }
