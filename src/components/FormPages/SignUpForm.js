@@ -19,27 +19,28 @@ function SignUpForm () {
   }
 
   useEffect(() => {
+    document.title = "BusyBuy | Create your account for free."
     if(user){
       navigate('/');
     }
   }, [user])
   
   return (
-    <div className='pt-32 h-screen dark:bg-slate-900 dark:text-gray-400'>
-    <div className={formStyle.pageStyle}>
-      <h1> Sign Up </h1>
+    <div className='dark:bg-slate-900 dark:text-gray-400'>
+      <div className={formStyle.pageStyle}>
+        <h1> Sign Up </h1>
 
-      <form onSubmit={handleSubmission}>
-        <input type="name" placeholder="Enter Name" onChange={(e) => setValues((prev) => ({...prev, name:e.target.value}))} required/>
-        <input type="email" placeholder="Enter email" onChange={(e) => setValues((prev) => ({...prev, email:e.target.value}))} required/>
-        <input type="passwrord" placeholder="Enter password" onChange={(e) => setValues((prev) => ({...prev, pass:e.target.value}))} required/>
-        <input type="passwrord" placeholder="Confirm password" onChange={(e) => setValues((prev) => ({...prev, confirmPass:e.target.value}))} required/>
-        
-        <button> Sign Up </button>
-      </form>
+        <form onSubmit={handleSubmission}>
+          <input type="name" placeholder="Enter Name" onChange={(e) => setValues((prev) => ({...prev, name:e.target.value}))} required/>
+          <input type="email" placeholder="Enter email" onChange={(e) => setValues((prev) => ({...prev, email:e.target.value}))} required/>
+          <input type="passwrord" placeholder="Enter password" onChange={(e) => setValues((prev) => ({...prev, pass:e.target.value}))} required/>
+          <input type="passwrord" placeholder="Confirm password" onChange={(e) => setValues((prev) => ({...prev, confirmPass:e.target.value}))} required/>
+          
+          <button> Sign Up </button>
+        </form>
 
-      <Link to='/signin' className="linkStyle"> Or Signin instead </Link>
-    </div>
+        <Link to='/signin' className="linkStyle"> Or Signin instead </Link>
+      </div>
     </div>
   )
 }

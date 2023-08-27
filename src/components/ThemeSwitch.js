@@ -18,9 +18,7 @@ const ThemeSwitch = () => {
 
   return (
     <div>
-    <button onClick={handleThemeSwitch}>
-    {theme === 'dark'? <FaMoon/> : <BsSunFill />}
-    </button>      
+      <button onClick={handleThemeSwitch}> {theme === 'dark'? <FaMoon/> : <BsSunFill />} </button>      
     </div>
   )
 }

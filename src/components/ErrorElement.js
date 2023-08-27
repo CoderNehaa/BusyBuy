@@ -1,13 +1,6 @@
-import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const ErrorElement = () => {
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        setTimeout(() => navigate(-1), 5000);
-    }, [])
-
   return (
     <div className='mt-20 text-center'>
       <h2 className='text-4xl'> Looking for something ? </h2>
@@ -21,4 +14,4 @@ const ErrorElement = () => {
   )
 }
 
-export default ErrorElement
+export default ErrorElement;

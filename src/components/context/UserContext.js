@@ -1,28 +1,26 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
 import db, { auth } from '../../firebase';
 import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import busyBuyReducer from "../Reducer";
+
 const userContext = createContext();
 
 // Custom Provider
 function UserCustomProvider({children}){
-    const[user, setUser] = useState(null);    //to store user info
-    const [data, setData] = useState([]);       // to get home page data
-    const [refresh, setRefresh] = useState(false);  //page should refresh or not
-    const[cartInfo, setCartInfo] = useState({totalItems:0, totalPrice:0, cartProducts:[]})
-    const[orders, setOrders] = useState([]);
-    const[searchText, setSearchText] = useState('');
-
     const categories = ["men's clothing", "women's clothing", "electronics", "jewelery"];
-    
+    const[state, dispatch] = useReducer(busyBuyReducer, {data:[], products:[], user:null, refresh:false, cartInfo:{totalItems:0, totalPrice:0, cartProducts:[]},orders:[], loading:false, searchText:'', filterPrice:100, selectedCategories:[]})
+
     // Sign up function
     async function signUp (data){
+        dispatch({type:'setData', payload: {state: 'loading', value:true}})
         createUserWithEmailAndPassword(auth, data.email, data.pass)
         .then(async(res) => {
             console.log("signed up successfully.")
@@ -39,15 +37,17 @@ function UserCustomProvider({children}){
             // Store user info in db
             const userDocRef = doc(db , "users" , currentUser.email);
             setDoc(userDocRef , currentUser);
-
-            setUser(currentUser);
+            dispatch({ type: 'setData' , payload:{state: 'user', value: currentUser} });
+            dispatch({type:'setData', payload: {state: 'loading', value:false}})
         }).catch((err) => {
             toast.error(err.message);
+            dispatch({type:'setData', payload: {state: 'loading', value:false}})
         })
     }
     
     // Sign In
      function logIn(data){
+        dispatch({type:'setData', payload: {state: 'loading', value:true}})
         signInWithEmailAndPassword(auth, data.email, data.pass)
         .then(async (res) => {
             console.log('signed in successfully');
@@ -58,10 +58,12 @@ function UserCustomProvider({children}){
                 cartInfo: {totalItems:0, totalPrice:0, cartProducts:[]},
                 orders:[]
             }
-            setUser(currentUser);
+            dispatch({ type: 'setData' , payload:{state: 'user', value: currentUser} });
+            dispatch({type:'setData', payload: {state: 'loading', value:false}})
         })
         .catch((err) => {
             toast.error(err.message);
+            dispatch({type:'setData', payload: {state: 'loading', value:false}})
         })
     }
 
@@ -70,63 +72,79 @@ function UserCustomProvider({children}){
         signOut(auth)
         .then(() => {
             console.log("signed out successfully ! ");
-            setUser(null)
+            dispatch({ type: 'setData' , payload:{state: 'user', value: null} });
         }).catch((err) => {
             toast.error(err.message);
         });
     }
 
-    const authentication = onAuthStateChanged(auth, (currentUser) => {
-        if(currentUser){
-            const user = {
-                userId: currentUser.uid,
-                name: currentUser.displayName,
-                email: currentUser.email,
-                cartInfo: {totalItems:0, totalPrice:0, cartProducts:[]},
-                orders:[]
+    const authentication = () => {
+        dispatch({type:'setData', payload: {state: 'loading', value:true}})
+        onAuthStateChanged(auth, (currentUser) => {
+            if(currentUser){
+                const user = {
+                    userId: currentUser.uid,
+                    name: currentUser.displayName,
+                    email: currentUser.email,
+                    cartInfo: {totalItems:0, totalPrice:0, cartProducts:[]},
+                    orders:[]
+                }
+                dispatch({ type: 'setData' , payload:{state: 'user', value: user} });
             }
-            setUser(user);
-        }
-    });
+        });
+        dispatch({type:'setData', payload: {state: 'loading', value:false}})
+    }
     
     //fecth products from api
     function fetchProducts () {
         axios.get('https://fakestoreapi.com/products').
-        then((response)=>{ setData(response.data)}).
+        then((response)=>{
+            dispatch({type: 'setData', payload:{state:'data', value: response.data}})
+        }).
         catch((err) => toast.error(err.message));
+    }
+    
+    // search query
+    const handleSearchChange = (e) => {
+        const newSearchText = e.target.value;
+        dispatch({type:'setData', payload: {state: 'searchText', value:newSearchText}})
+    };
+
+    // Filter products based on category and price
+    const filterProducts = (category, price) => {
+        dispatch({type:'setData', payload: {state: 'filterPrice', value:price}})
+        if(category !== null){
+            if (state.selectedCategories.includes(category)) {                  // removing category
+                dispatch({type:'remove', payload: {state:'selectedCategories', value: category}})
+            } else {                                                            // Adding selected category
+                dispatch({type: 'add', payload: {state: 'selectedCategories', value:category}})
+            }
+        }
     }
 
     // Get cart products
     function getCartProducts (){
-        const unsub = onSnapshot(doc(db, "users", user.email), (currentUser) => {
+        const unsub = onSnapshot(doc(db, "users", state.user.email), (currentUser) => {
             if(currentUser.data()){
-                setCartInfo(currentUser.data().cartInfo)
+                dispatch({ type: 'setData' , payload:{state: 'cartInfo', value: currentUser.data().cartInfo} });
             }
         });
     }
 
     // Get all orders
     function getOrders(){
-        const unsub = onSnapshot(doc(db, "users", user.email),(currentUser) => {
+        const unsub = onSnapshot(doc(db, "users", state.user.email),(currentUser) => {
             if(currentUser.data()){
-                setOrders(currentUser.data().orders)
+                dispatch({ type: 'setData' , payload:{state: 'orders', value: currentUser.data().orders} });
             }
         })
     }
 
-    useEffect(() => {
-        if(user){
-            getCartProducts();
-            getOrders();
-        }
-    }, [refresh]);
-
-
-    //   Add to cart
+    //  Add to cart
     async function addToCart(obj){
-        const docRef = doc(db, "users", user.email);
-        const item = { category : obj.category, id:obj.id, image:obj.image, price:obj.price, title:obj.title, count:1 };
-        const isItemInCart = cartInfo.cartProducts.some(product => product.id === item.id);
+        const docRef = doc(db, "users", state.user.email);
+        const item = { category : obj.category, id:obj.id, image:obj.image, price:obj.price, title:obj.title, count:1, rating:obj.rating.rate};
+        const isItemInCart = state.cartInfo.cartProducts.some(product => product.id === item.id);
         
         if (isItemInCart) {
             toast.info("Product already present in the cart");
@@ -135,80 +153,80 @@ function UserCustomProvider({children}){
         
         await updateDoc(docRef, {
             cartInfo:{
-                        cartProducts: [...cartInfo.cartProducts, item],
-                        totalItems : cartInfo.totalItems + 1,
-                        totalPrice : cartInfo.totalPrice + item.price
+                        cartProducts: [...state.cartInfo.cartProducts, item],
+                        totalItems : state.cartInfo.totalItems + 1,
+                        totalPrice : state.cartInfo.totalPrice + item.price
                     }
         });
-        setRefresh(!refresh);
+        dispatch({type: 'setData', payload:{state:'refresh', value: !state.refresh}})
         toast.success("Product added successfully");
     }
     
+    // Remove product from cart
     async function removeFromCart(item){
-        const docRef = doc(db, "users", user.email);
-        const updatedArray = cartInfo.cartProducts.filter((product) => product.id !== item.id);
+        const docRef = doc(db, "users", state.user.email);
+        const updatedArray = state.cartInfo.cartProducts.filter((product) => product.id !== item.id);
 
         await updateDoc(docRef, {
             cartInfo:{
                         cartProducts: updatedArray,
-                        totalItems : cartInfo.totalItems - item.count,
-                        totalPrice : cartInfo.totalPrice - item.price * item.count
+                        totalItems : state.cartInfo.totalItems - item.count,
+                        totalPrice : state.cartInfo.totalPrice - item.price * item.count
                     }
         });
         
-        setRefresh(!refresh);
+        dispatch({type: 'setData', payload:{state:'refresh', value: !state.refresh}})
         toast.success("Product Removed successfully");
     }
 
     //increase qty of product in cart
     const increaseProduct = async(product)=>{
-        let index = cartInfo.cartProducts.findIndex((el)=> el.id === product.id);
+        let index = state.cartInfo.cartProducts.findIndex((el)=> el.id === product.id);
         
         if(index !== -1){
-            cartInfo.cartProducts[index].count++;
+            state.cartInfo.cartProducts[index].count++;
             
-            const docRef = doc(db, "users", user.email);
+            const docRef = doc(db, "users", state.user.email);
             await updateDoc(docRef, {
                 cartInfo:{
-                            cartProducts: cartInfo.cartProducts,
-                            totalItems : cartInfo.totalItems + 1,
-                            totalPrice : cartInfo.totalPrice + product.price
+                            cartProducts: state.cartInfo.cartProducts,
+                            totalItems : state.cartInfo.totalItems + 1,
+                            totalPrice : state.cartInfo.totalPrice + product.price
                         }
                         
             });
-            setRefresh(!refresh);
+            dispatch({type: 'setData', payload:{state:'refresh', value: !state.refresh}})
         }
     }
 
     //decrease qty of product in cart
     const decreaseProduct = async(product) => {
-        let index = cartInfo.cartProducts.findIndex((el)=> el.id === product.id);
+        let index = state.cartInfo.cartProducts.findIndex((el)=> el.id === product.id);
         
         if(index !== -1 ){
-            if(cartInfo.cartProducts[index].count > 1){
-                cartInfo.cartProducts[index].count--;
+            if(state.cartInfo.cartProducts[index].count > 1){
+                state.cartInfo.cartProducts[index].count--;
             
-                const docRef = doc(db, "users", user.email);
+                const docRef = doc(db, "users", state.user.email);
                 await updateDoc(docRef, {
                     cartInfo:{
-                                cartProducts: cartInfo.cartProducts,
-                                totalItems : cartInfo.totalItems - 1,
-                                totalPrice : cartInfo.totalPrice - product.price
+                                cartProducts: state.cartInfo.cartProducts,
+                                totalItems : state.cartInfo.totalItems - 1,
+                                totalPrice : state.cartInfo.totalPrice - product.price
                             }
                             
                 });
-                setRefresh(!refresh);
+                dispatch({type: 'setData', payload:{state:'refresh', value: !state.refresh}})
             } else {
-                toast.info("Product qty can't be less than one. ");
+                removeFromCart(product);
                 return;   
-            }
-            
+            }      
         }
     }
 
     // To make the cart empty
     async function clearCart(){
-        const docRef = doc(db, "users", user.email);
+        const docRef = doc(db, "users", state.user.email);
         await updateDoc(docRef, {
             cartInfo:{
                         cartProducts: [],
@@ -216,27 +234,63 @@ function UserCustomProvider({children}){
                         totalPrice : 0
                     }
         });
-        setRefresh(!refresh);    
+        dispatch({type: 'setData', payload:{state:'refresh', value: !state.refresh}})    
     }
 
+    // To purchase the cart products
     async function purchase(){
         let date = new Date();
         let currentDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
 
         let order = {
             orderDate : currentDate, 
-            totalPrice : cartInfo.totalPrice,
-            orderedProductDetails : cartInfo.cartProducts
+            totalPrice : state.cartInfo.totalPrice,
+            orderedProductDetails : state.cartInfo.cartProducts
         }
 
-        const docRef = doc(db, 'users', user.email);
-        await updateDoc(docRef, {orders: [order, ...orders]});
-        setRefresh(!refresh);
+        const docRef = doc(db, 'users', state.user.email);
+        await updateDoc(docRef, {orders: [order, ...state.orders]});
+        dispatch({type:'setData', payload:{state:'refresh', value: !state.refresh}})
     }
 
+    // Use Effect hook to fill the products array with data
+    useEffect(() => {   
+        dispatch({type:'setData', payload: {state:'products', value: state.data}})
+    },[state.data])
+
+    // Use Effect hook to refresh the page for search query
+    useEffect(() => {
+        const filteredProducts = state.products.filter(product => product.title.toLowerCase().includes(state.searchText.toLowerCase()));
+        dispatch({type:'setData', payload: {state:'products', value: filteredProducts}})
+    },[state.searchText])
+    
+    // Use Effect hook to apply filters
+    useEffect(() => {
+        if(state.selectedCategories.length === 0){
+            const filteredProducts = state.data.filter(product => product.price < state.filterPrice);  
+            dispatch({type:'setData', payload: {state:'products', value: filteredProducts}})
+        } else {
+            const filteredProducts = state.data.filter(product => product.price < state.filterPrice && state.selectedCategories.includes(product.category));
+            dispatch({type:'setData', payload: {state:'products', value: filteredProducts}})
+        }
+    }, [state.selectedCategories, state.filterPrice])
+  
+    // Use Effect hook to refresh the page for cart products and orders
+    useEffect(() => {
+        if(state.user){
+            getCartProducts();
+            getOrders();
+        }
+    }, [state.refresh]);
+
     return(
-        <userContext.Provider value={{ 
-            signUp, logOut, logIn, user, categories, toast, data, addToCart, cartInfo, authentication, fetchProducts, getCartProducts, removeFromCart, increaseProduct, decreaseProduct, clearCart, purchase, orders, getOrders 
+        <userContext.Provider value={{
+            loading:state.loading,
+            signUp, logIn, logOut, authentication,
+            user:state.user, products:state.products, fetchProducts, getCartProducts, getOrders,
+            handleSearchChange, categories, filterProducts, value:state.filterPrice,
+            cartInfo:state.cartInfo, addToCart, removeFromCart, increaseProduct, decreaseProduct, clearCart, purchase, 
+            orders:state.orders 
         }}>
             {children}
         </userContext.Provider>
