@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { RouterProvider, createBrowserRouter} from 'react-router-dom';
-import { UserCustomHook } from './components/context/UserContext';
+import { UserCustomHook } from './context/UserContext';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

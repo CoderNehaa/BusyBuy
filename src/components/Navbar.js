@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { UserCustomHook } from './context/UserContext';
+import { UserCustomHook } from '../context/UserContext';
 import ThemeSwitch from './ThemeSwitch';
 import Filter from "./Filter";
 import Loader from './Loader';
@@ -13,7 +13,7 @@ const Navbar = () => {
     return (
         <>
         {loading 
-        ?<Loader />
+        ?<Loader /> //Display loader if data is still loading.
         :<>
             <div className="fixed shadow-lg shadow-white-10 w-full z-1 bg-slate-100 top-0 lg:flex lg:justify-between items-center dark:bg-slate-900 dark:text-slate-400 dark:shadow-md dark:shadow-slate-800">
                 <div>
@@ -26,12 +26,12 @@ const Navbar = () => {
                 </div>
 
                 {location.pathname === '/' && <div className='text-md bg-white w-96 sm:w-11/12 lg:w-72 m-auto p-2 border-2 font-normal xl:w-96 border-gray-200 dark:bg-slate-800 dark:border-slate-800'> 
-                    <i class="fa-solid fa-magnifying-glass mr-4"></i>
+                    <i className="fa-solid fa-magnifying-glass mr-4"></i>
                     <input 
                         type="search"
-                        onChange={handleSearchChange}
+                        onChange={(e) => handleSearchChange(e.target.value)}
                         placeholder="Search by Name"
-                        className='bg-transparent focus:outline-none w-80 lg:w-48 desktop:w-80' 
+                        className='bg-transparent focus:outline-none w-80 lg:w-56 xl:w-80' 
                         required/>
                 </div>}
                 
@@ -54,14 +54,14 @@ const Navbar = () => {
 
                         {user && <li className="dark:hover:text-sky-700"> 
                         <i className="fa-solid fa-cart-shopping mr-2 invisible lg:visible"></i>
-                            <NavLink to='/cart' className={({isActive}) => isActive ? 'lg:border-b-4 border-red-950 dark:border-slate-400':null}> 
+                            <NavLink to='/cart' className={({isActive}) => isActive ? 'border-b-4 border-red-950 dark:border-slate-400':null}> 
                                 Cart 
                             </NavLink> 
                         </li>}
 
                         {user &&<li className="dark:hover:text-sky-700"> 
                         <i className="fa-solid fa-clipboard-list mr-2 invisible lg:visible"></i>
-                        <NavLink to='/orders' className={({isActive}) => isActive ? 'lg:border-b-4 border-red-950 dark:border-slate-400':null}>
+                        <NavLink to='/orders' className={({isActive}) => isActive ? 'border-b-4 border-red-950 dark:border-slate-400':null}>
                             My Orders </NavLink> 
                         </li>}
 
@@ -70,13 +70,11 @@ const Navbar = () => {
                             <Link to = '/' className="linkStyle" onClick={logOut}> Sign Out </Link>
                         </li>}
 
-                        <i className="fa-solid fa-filter mr-2 invisible lg:visible"></i>
                         {location.pathname === '/' && <li className={`dark:hover:text-sky-700 ${showFilter && 'border-b-4 border-red-950 dark:border-slate-400'}`}> 
+                        <i className="fa-solid fa-filter mr-2 invisible lg:visible"></i>
                             <button className= "tracking-wide" onClick={() => setShowFilter(!showFilter)}> Filter </button>
                         </li>}
-                        {showFilter && <Filter/>}
-
-                        
+                        {showFilter && <Filter/>}                        
                     </ul>
                 </div> 
                 

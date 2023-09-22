@@ -16,9 +16,9 @@
 
 .pageStyle input{
     font-size: 20px;
-    width: 440px;
-    padding: 20px;
-    margin: 15px;
+    width: 400px;
+    padding: 15px;
+    margin: 10px;
     border-radius: 15px;
     background: transparent;
     border: 1px solid gray;
@@ -26,8 +26,8 @@
 
 .pageStyle button{
     font-size: 25px;
-    width: 450px;
-    padding: 20px;
+    width: 400px;
+    padding: 15px;
     margin: 15px;
     border-radius: 15px;
     color: white;

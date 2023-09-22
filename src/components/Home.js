@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { UserCustomHook } from "./context/UserContext";
+import { UserCustomHook } from "../context/UserContext";
 
 import ProductCard from "./ProductCard";
 const Home = () => {
   const {user, products, fetchProducts, getCartProducts, getOrders} = UserCustomHook();
   
+  // useEffect hook to fetch products, fetch cart products and orders also if the user is logged in
   useEffect(() => {
     fetchProducts();
     document.title = "BusyBuy | Busy in buying"

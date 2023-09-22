@@ -1,18 +1,22 @@
 import React, { useEffect } from 'react';
-import { UserCustomHook } from './context/UserContext';
+import { UserCustomHook } from '../context/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Cart = () => {
   const { cartInfo ,getCartProducts, removeFromCart, increaseProduct, decreaseProduct, clearCart, purchase } = UserCustomHook();
   const navigate = useNavigate();
+
+  // Calculating discount and billing price based on the cart's total price
   const discount = (cartInfo.totalPrice*0.10).toFixed(0);
   const billingPrice = (cartInfo.totalPrice - discount).toFixed(0);
 
   useEffect(() => {
+    // Fetching cart products and updating document title
     getCartProducts();
     document.title = "BusyBuy | Cart"
   })
     
+  // Function to handle purchase and navigate to orders
   function handlePurchase(){
     purchase();
     clearCart();

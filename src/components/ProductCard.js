@@ -1,11 +1,12 @@
 import React from 'react'
-import { UserCustomHook } from './context/UserContext'
+import { UserCustomHook } from '../context/UserContext'
 import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({product}) => {
   const { user, addToCart } = UserCustomHook();
   const navigate = useNavigate();
 
+  // Function to handle "Add to Cart" button
   function handleCartBtn(product){
     if(user === null){
       navigate('/signin');

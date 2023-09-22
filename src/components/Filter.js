@@ -1,8 +1,9 @@
 import React from "react";
-import { UserCustomHook } from "./context/UserContext";
+import { UserCustomHook } from "../context/UserContext";
 
 function Filter () {
-    const {categories, filterProducts, value} = UserCustomHook();
+  // Destructuring values from the custom hook related to filtering products
+  const {categories, filterProducts, value} = UserCustomHook();
     
   return (
       <div className="w-48 px-2 py-1 bg-slate-200 text-left text-lg tracking-wide fixed right-1 top-36 dark:bg-slate-700">

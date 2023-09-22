@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react'
-import { UserCustomHook } from './context/UserContext';
+import { UserCustomHook } from '../context/UserContext';
 import { Link } from 'react-router-dom';
 
 const Orders = () => {
   const {orders, getOrders} = UserCustomHook();
   
+  // useEffect hook to fetch orders and update document title
   useEffect(() => {
     getOrders();
     document.title = "BusyBuy | Orders"
@@ -31,7 +32,7 @@ const Orders = () => {
                 <table className='laptop:w-1/2 text-left tracking-wider text-black dark:text-gray-400 sm:w-[600px] lg:w-[900px]'>
                   <thead className='text-md font-normal text-gray-700 bg-gray-400 dark:bg-gray-700 dark:text-gray-400'>
                       <tr className='text-center'>
-                        <th> Title </th>
+                        <th className='py-2'> Title </th>
                         <th> Price </th>
                         <th> Qty. </th>
                         <th> TC </th>
@@ -41,10 +42,10 @@ const Orders = () => {
                     <tbody>
                     {order.orderedProductDetails.map((product, index) => 
                       <tr key={index} className='bg-gray-200 dark:bg-gray-800 dark:border-gray-700'> 
-                        <td className='p-1'> {product.title} </td>
-                        <td className='p-1'> {(product.price).toFixed(0)} </td>
-                        <td className='p-1'> {product.count} </td>
-                        <td className='p-1'> {(product.count * product.price).toFixed(0)} </td> 
+                        <td className='p-1 lg:p-2'> {product.title} </td>
+                        <td className='p-1 lg:p-2'> {(product.price).toFixed(0)} </td>
+                        <td className='p-1 lg:p-2'> {product.count} </td>
+                        <td className='p-1 lg:p-2'> {(product.count * product.price).toFixed(0)} </td> 
                       </tr>                      
                       )}
                     </tbody>

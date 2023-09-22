@@ -2,21 +2,21 @@ import { createContext, useContext, useEffect, useReducer } from "react";
 
 import axios from 'axios';
 
-import db, { auth } from '../../firebase';
-import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import db, { auth } from '../firebase';
+import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import busyBuyReducer from "../Reducer";
+import busyBuyReducer from '../Reducer';
 
 const userContext = createContext();
 
 // Custom Provider
 function UserCustomProvider({children}){
     const categories = ["men's clothing", "women's clothing", "electronics", "jewelery"];
-    const[state, dispatch] = useReducer(busyBuyReducer, {data:[], products:[], user:null, refresh:false, cartInfo:{totalItems:0, totalPrice:0, cartProducts:[]},orders:[], loading:false, searchText:'', filterPrice:100, selectedCategories:[]})
+    const[state, dispatch] = useReducer(busyBuyReducer, {data:[], products:[], user:null, refresh:false, cartInfo:{totalItems:0, totalPrice:0, cartProducts:[]},orders:[], loading:false, searchText:'', filterPrice:1000, selectedCategories:[]})
 
     // Sign up function
     async function signUp (data){
@@ -67,6 +67,25 @@ function UserCustomProvider({children}){
         })
     }
 
+    const signInWithGoogle = () => {
+        dispatch({type:'setData', payload: {state: 'loading', value:true}})
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider)
+        .then((res) => {
+            const currentUser = {
+                name: res.user.displayName,
+                email: res.user.email,
+                cartInfo: {totalItems:0, totalPrice:0, cartProducts:[]},
+                orders:[]
+            }
+            dispatch({ type: 'setData' , payload:{state: 'user', value: currentUser} });
+            dispatch({type:'setData', payload: {state: 'loading', value:false}})
+        }).catch((err) => {
+            toast.error(err.message);
+            dispatch({type:'setData', payload: {state: 'loading', value:false}})
+        })
+    }
+
     // Sign out
     function logOut(){
         signOut(auth)
@@ -97,17 +116,16 @@ function UserCustomProvider({children}){
     
     //fecth products from api
     function fetchProducts () {
-        axios.get('https://fakestoreapi.com/products').
-        then((response)=>{
+        axios.get('https://fakestoreapi.com/products')
+        .then((response)=>{
             dispatch({type: 'setData', payload:{state:'data', value: response.data}})
-        }).
-        catch((err) => toast.error(err.message));
+        })
+        .catch((err) => toast.error(err.message));
     }
     
     // search query
-    const handleSearchChange = (e) => {
-        const newSearchText = e.target.value;
-        dispatch({type:'setData', payload: {state: 'searchText', value:newSearchText}})
+    const handleSearchChange = (text) => {
+        dispatch({type:'setData', payload: {state: 'searchText', value:text}})    
     };
 
     // Filter products based on category and price
@@ -257,23 +275,20 @@ function UserCustomProvider({children}){
     useEffect(() => {   
         dispatch({type:'setData', payload: {state:'products', value: state.data}})
     },[state.data])
-
-    // Use Effect hook to refresh the page for search query
-    useEffect(() => {
-        const filteredProducts = state.products.filter(product => product.title.toLowerCase().includes(state.searchText.toLowerCase()));
-        dispatch({type:'setData', payload: {state:'products', value: filteredProducts}})
-    },[state.searchText])
     
-    // Use Effect hook to apply filters
+    // Use Effect hook to apply filters and search query
     useEffect(() => {
-        if(state.selectedCategories.length === 0){
-            const filteredProducts = state.data.filter(product => product.price < state.filterPrice);  
-            dispatch({type:'setData', payload: {state:'products', value: filteredProducts}})
-        } else {
-            const filteredProducts = state.data.filter(product => product.price < state.filterPrice && state.selectedCategories.includes(product.category));
-            dispatch({type:'setData', payload: {state:'products', value: filteredProducts}})
-        }
-    }, [state.selectedCategories, state.filterPrice])
+        const { searchText, filterPrice, selectedCategories } = state;
+
+        const filteredProducts = state.data.filter(product => {
+            const matchesPrice = !filterPrice || product.price < filterPrice;
+            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+            const matchesSearchText = state.searchText === '' || product.title.toLowerCase().includes(searchText.toLowerCase());
+            return matchesPrice && matchesCategory && matchesSearchText;
+        });
+
+        dispatch({ type: 'setData', payload: { state: 'products', value: filteredProducts } }); 
+    }, [state.selectedCategories, state.filterPrice, state.searchText])
   
     // Use Effect hook to refresh the page for cart products and orders
     useEffect(() => {
@@ -286,7 +301,7 @@ function UserCustomProvider({children}){
     return(
         <userContext.Provider value={{
             loading:state.loading,
-            signUp, logIn, logOut, authentication,
+            signUp, logIn, signInWithGoogle, logOut, authentication,
             user:state.user, products:state.products, fetchProducts, getCartProducts, getOrders,
             handleSearchChange, categories, filterProducts, value:state.filterPrice,
             cartInfo:state.cartInfo, addToCart, removeFromCart, increaseProduct, decreaseProduct, clearCart, purchase, 
