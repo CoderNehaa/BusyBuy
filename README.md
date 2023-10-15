@@ -38,4 +38,4 @@ react-toastify
 react-loader-spinner
 tailwindcss
 
-[LIVE PROJECT](busybuy.netlify.app)
+[LIVE PROJECT](https://busybuying.netlify.app/)
