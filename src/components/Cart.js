@@ -13,7 +13,7 @@ const Cart = () => {
   useEffect(() => {
     // Fetching cart products and updating document title
     getCartProducts();
-    document.title = "BusyBuy | Cart"
+    document.title = "BusyBuy | Cart";
   })
     
   // Function to handle purchase and navigate to orders
