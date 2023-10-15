@@ -37,3 +37,5 @@ firebase
 react-toastify
 react-loader-spinner
 tailwindcss
+
+[LIVE PROJECT](busybuy.netlify.app)
