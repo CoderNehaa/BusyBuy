@@ -1,6 +1,6 @@
 # BusyBuy-redux
 
-This is an e-commerce website, where user can look any product details and purchase products after creating their account. 
+This is an e-commerce website, where user can look any product details and purchase products after creating their account, this site is developed using react, firebase and context API. 
 
 FEATURES -
 
